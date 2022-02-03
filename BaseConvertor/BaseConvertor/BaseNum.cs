@@ -10,7 +10,7 @@
             get; private set;
         }
 
-        public BaseNum(int valueBase, string value) {
+        public BaseNum(string value, int valueBase = 10) {
             Base = valueBase;
             Value = value;
         }
