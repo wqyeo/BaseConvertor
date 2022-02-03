@@ -35,6 +35,13 @@ namespace BaseConvertor {
             'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
             'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x'};
 
+        /// <summary>
+        /// Convert value from Base N to base M
+        /// </summary>
+        /// <param name="value">Value</param>
+        /// <param name="baseValue">Base of the Value</param>
+        /// <param name="toBase">Base to convert to.</param>
+        /// <returns></returns>
         public static BaseNum Convert(string value, int baseValue, int toBase) {
 
             if (toBase == baseValue) {
@@ -55,6 +62,12 @@ namespace BaseConvertor {
             }
         }
 
+        /// <summary>
+        /// Convert value from Base N to base M
+        /// </summary>
+        /// <param name="baseNum">Value and it's Base</param>
+        /// <param name="toBase">Base to convert to.</param>
+        /// <returns></returns>
         public static BaseNum Convert(BaseNum baseNum, int toBase) {
             return Convert(baseNum.Value, baseNum.Base, toBase);
         }
@@ -64,47 +77,43 @@ namespace BaseConvertor {
             var base10String = base10Value.ToString();
             if (base10String.Contains('.')) {
 
-                // TODO: Refactor
+                // Split the decimals.
                 var decimalSplit = base10String.Split('.');
                 var beforeDecimal = int.Parse(decimalSplit[0]);
                 var afterDecimal = double.Parse("0." + decimalSplit[1]);
 
-                StringBuilder beforeDecimalResult = new StringBuilder();
-                StringBuilder afterDecimalResult = new StringBuilder();
-
-                do {
-                    beforeDecimalResult.Append(Sexagesimal_Table[beforeDecimal % targetBase]);
-                    beforeDecimal /= targetBase;
-                } while (beforeDecimal > 0);
-
-                int maxLoopCycle = 25;
-                int i = 0;
-                do {
-                    afterDecimal *= targetBase;
-                    int overflow = (int) Math.Truncate(afterDecimal);
-                    afterDecimalResult.Append(Sexagesimal_Table[overflow % targetBase]);
-                    afterDecimal -= Math.Truncate(afterDecimal);
-
-                    ++i;
-                } while (afterDecimal > 0 || i <= maxLoopCycle);
-
-                string result = Reverse(beforeDecimalResult.ToString()) + "." + afterDecimalResult.ToString();
+                string result = Reverse(OperateValueBeforeDecimal(beforeDecimal)) + "." + OperateValueAfterDecimal(afterDecimal);
                 return new BaseNum(result, targetBase);
             } else {
-                return OperateValueAsWholeNumber();
+                return new BaseNum(OperateValueBeforeDecimal((int)base10Value), targetBase);
             }
 
             #region Local_Function
-            BaseNum OperateValueAsWholeNumber() {
-                StringBuilder result = new StringBuilder();
 
-                int base10Int = (int)base10Value;
+            string OperateValueAfterDecimal(double afterDecimalValue) {
+                StringBuilder afterDecimalResult = new StringBuilder();
+                int maxLoopCycle = 25;
+                int i = 0;
                 do {
-                    result.Append(Sexagesimal_Table[(int)base10Int % targetBase]);
-                    base10Int /= targetBase;
-                } while (base10Int > 0);
+                    afterDecimalValue *= targetBase;
+                    int overflow = (int)Math.Truncate(afterDecimalValue);
+                    afterDecimalResult.Append(Sexagesimal_Table[overflow % targetBase]);
+                    afterDecimalValue -= Math.Truncate(afterDecimalValue);
 
-                return new BaseNum(Reverse(result.ToString()), targetBase);
+                    ++i;
+                } while (afterDecimalValue > 0 && i <= maxLoopCycle);
+
+                return afterDecimalResult.ToString();
+            }
+
+            string OperateValueBeforeDecimal(int beforeDecimalValue) {
+                StringBuilder result = new StringBuilder();
+                do {
+                    result.Append(Sexagesimal_Table[(int)beforeDecimalValue % targetBase]);
+                    beforeDecimalValue /= targetBase;
+                } while (beforeDecimalValue > 0);
+
+                return Reverse(result.ToString());
             }
             #endregion
         }
@@ -172,7 +181,7 @@ namespace BaseConvertor {
                         cValue -= 61;
                     } else {
                         // Out of library's ASCII range to handle.
-                        return new TryMessage(false, new ASCIIOutOfRangeException("Out of ASCII range to handle; Only '0-9', 'A-Z' and 'a-z' are handled."));
+                        return new TryMessage(false, new ASCIIOutOfRangeException("Out of ASCII range to handle; Only '0-9', 'A-Z' and 'a-z' are handled, Base62."));
                     }
 
                 }
