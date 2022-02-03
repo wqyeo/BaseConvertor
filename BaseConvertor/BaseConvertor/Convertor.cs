@@ -43,7 +43,7 @@ namespace BaseConvertor {
                 base10Value /= targetBase;
             } while (base10Value > 0);
 
-            return new BaseNum(result.ToString().Reverse().ToString(), targetBase);
+            return new BaseNum(Reverse(result.ToString()), targetBase);
         }
 
         public static BaseNum ToBase10(string value, int baseValue) {
@@ -105,6 +105,12 @@ namespace BaseConvertor {
             }
 
             return new TryMessage(true);
+        }
+
+        private static string Reverse(string s) {
+            char[] charArray = s.ToCharArray();
+            Array.Reverse(charArray);
+            return new string(charArray);
         }
     }
 }
