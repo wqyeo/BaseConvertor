@@ -12,8 +12,23 @@ namespace BaseConvertor {
             'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x'};
 
         public static BaseNum Convert(string value, int baseValue, int toBase) {
-            BaseNum base10 = ToBase10(value, baseValue);
-            return FromBase10ToX(int.Parse(base10.Value), toBase);
+
+            if (toBase == baseValue) {
+                return new BaseNum(value, toBase);
+            }
+
+            if (baseValue == 10) {
+                if (!int.TryParse(value, out int b10)) {
+                    throw new InvalidBaseValueException("Value given does not match with the given base.");
+                } else {
+                    return FromBase10ToX(b10, toBase);
+                }
+            } else if (toBase == 10) {
+                return ToBase10(value, baseValue);
+            } else {
+                BaseNum base10 = ToBase10(value, baseValue);
+                return FromBase10ToX(int.Parse(base10.Value), toBase);
+            }
         }
 
         public static BaseNum Convert(BaseNum baseNum, int toBase) {
