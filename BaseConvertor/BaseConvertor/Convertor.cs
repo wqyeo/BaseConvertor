@@ -56,8 +56,7 @@ namespace BaseConvertor {
             int rawResult = 0;
 
             for (int i = 0; i < rawValue.Count; ++i) {
-                // Only multiply by baseValue if not the last digit.
-                rawResult += rawValue[i] * (i == rawValue.Count - 1 ? 1 : baseValue);
+                rawResult += rawValue[i] * (int) Math.Pow(baseValue, i);
             }
 
             return new BaseNum(rawResult.ToString(), 10);
@@ -85,10 +84,10 @@ namespace BaseConvertor {
                     cValue = (int)c;
                     if (c >= 65 && c <= 90) {
                         // 'A-Z'
-                        cValue -= 54;
+                        cValue -= 55;
                     } else if (c >= 97 && c <= 122) {
                         // 'a-z'; Notice the case-sensitivity.
-                        cValue -= 60;
+                        cValue -= 61;
                     } else {
                         // Out of library's ASCII range to handle.
                         return new TryMessage(false, new ASCIIOutOfRangeException("Out of ASCII range to handle; Only '0-9', 'A-Z' and 'a-z' are handled."));
@@ -96,7 +95,7 @@ namespace BaseConvertor {
 
                 }
 
-                if (cValue >= baseValue) {
+                if (cValue > baseValue) {
                     // One of the value doesn't match up with the Base provided.
                     return new TryMessage(false, new InvalidBaseValueException("Value given does not match with the given base."));
                 }
